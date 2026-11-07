@@ -18,7 +18,10 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "io.github.fei2411.dsbot"
+      "package": "io.github.fei2411.dsbot",
+      "permissions": [
+        "INTERNET"
+      ]
     },
     "scheme": "dsbot"
   }

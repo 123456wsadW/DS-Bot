@@ -1,0 +1,6 @@
+{
+  "platforms": ["android"],
+  "android": {
+    "modules": ["io.github.fei2411.dsbot.locallinux.LocalLinuxModule"]
+  }
+}

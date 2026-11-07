@@ -1,0 +1,16 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+group = 'io.github.fei2411.dsbot.locallinux'
+version = '0.1.0'
+
+android {
+  namespace 'io.github.fei2411.dsbot.locallinux'
+  compileSdkVersion rootProject.ext.compileSdkVersion
+  defaultConfig { minSdkVersion rootProject.ext.minSdkVersion }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  implementation 'org.apache.commons:commons-compress:1.27.1'
+}
