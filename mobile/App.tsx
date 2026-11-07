@@ -10,15 +10,13 @@ export default function App() {
   const [status, setStatus] = useState<LocalLinuxStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('正在检查本地运行环境…');
-  const [runtimeUrl, setRuntimeUrl] = useState('');
-  const [runtimeSha, setRuntimeSha] = useState('');
   const [apiKey, setApiKey] = useState('');
 
   const refresh = useCallback(async () => {
     try {
       const next = await LocalLinux.getStatus();
       setStatus(next);
-      setMessage(next.installed ? 'Linux 环境已安装' : '等待安装 Linux 运行环境');
+      setMessage(next.installed ? 'Linux 环境已安装' : '等待安装内置 Linux 环境');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : '无法读取本地运行状态');
     }
@@ -28,11 +26,11 @@ export default function App() {
 
   const install = async () => {
     setBusy(true);
-    setMessage('正在下载并校验 ARM64 Linux 环境…');
+    setMessage('正在安装内置 ARM64 Linux 环境…');
     try {
-      const next = await LocalLinux.installRuntime(runtimeUrl.trim(), runtimeSha.trim());
+      const next = await LocalLinux.installRuntime('asset://runtime.tar.gz', 'embedded');
       setStatus(next);
-      setMessage('Linux 运行环境安装完成');
+      setMessage('内置 Linux 运行环境安装完成');
     } catch (error) { setMessage(error instanceof Error ? error.message : '安装运行环境失败'); }
     finally { setBusy(false); }
   };
@@ -66,8 +64,8 @@ export default function App() {
 
         <View style={styles.hero}>
           <Text style={styles.heroLabel}>ANDROID · ARM64 · NO ROOT</Text>
-          <Text style={styles.heroTitle}>手机本地运行版正在搭建。</Text>
-          <Text style={styles.heroDesc}>目标是将 Linux 用户空间安装在应用私有目录，实现免 Root、无需电脑配对。当前 ARM64 运行包尚未就绪。</Text>
+          <Text style={styles.heroTitle}>手机本地运行版</Text>
+          <Text style={styles.heroDesc}>Linux ARM64 运行环境已内置在安装包中。首次使用时安装到应用私有目录，无需手动下载运行包。</Text>
           <View style={styles.statusLine}><View style={[styles.dot, { backgroundColor: status?.installed ? colors.green : colors.amber }]} /><Text style={styles.statusText}>{message}</Text></View>
         </View>
 
@@ -81,12 +79,9 @@ export default function App() {
 
         <Text style={styles.section}>Linux 运行包</Text>
         <View style={styles.card}>
-          <Text style={styles.fieldLabel}>ARM64 运行包 HTTPS 下载地址</Text>
-          <TextInput value={runtimeUrl} onChangeText={setRuntimeUrl} autoCapitalize="none" autoCorrect={false} placeholder="https://…/ds-bot-linux-arm64.tar.gz" placeholderTextColor="#63738C" style={styles.input} />
-          <Text style={styles.fieldLabel}>SHA-256 校验值</Text>
-          <TextInput value={runtimeSha} onChangeText={setRuntimeSha} autoCapitalize="none" autoCorrect={false} placeholder="64 位 SHA-256" placeholderTextColor="#63738C" style={styles.input} />
-          <TouchableOpacity style={[styles.button, styles.secondary]} onPress={install} disabled={busy || !runtimeUrl.trim() || runtimeSha.trim().length !== 64}>
-            <Text style={styles.secondaryText}>下载并安装 Linux 环境</Text>
+          <Text style={styles.fieldLabel}>ARM64 Linux 环境已随 APK 内置，无需填写下载地址或校验值。</Text>
+          <TouchableOpacity style={[styles.button, styles.secondary]} onPress={install} disabled={busy || !!status?.installed}>
+            <Text style={styles.secondaryText}>{status?.installed ? 'Linux 环境已安装' : '安装内置 Linux 环境'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -102,7 +97,7 @@ export default function App() {
         <Text style={styles.section}>控制台</Text>
         <View style={styles.card}>
           <Text style={styles.consoleTitle}>LOCAL RUNTIME</Text>
-          <Text selectable style={styles.console}>{status?.lastOutput || '当前版本已接入原生运行管理接口。Linux ARM64 运行包和 DSH 启动配置仍在构建，暂不能启动 Agent。'}</Text>
+          <Text selectable style={styles.console}>{status?.lastOutput || '内置 Linux ARM64 运行环境就绪后，即可配置 DeepSeek API Key 并启动本地 Bot。'}</Text>
         </View>
 
         <TouchableOpacity style={[styles.button, styles.secondary]} onPress={refresh} disabled={busy}>
