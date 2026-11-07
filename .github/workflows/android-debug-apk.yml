@@ -11,6 +11,9 @@ on:
     branches: [main, master]
     paths:
       - 'mobile/**'
+      - 'docker/**'
+      - 'ds-bot/**'
+      - 'scripts/build-android-runtime.sh'
       - '.github/workflows/android-debug-apk.yml'
 
 permissions:
@@ -36,9 +39,6 @@ jobs:
       - name: Install JavaScript dependencies
         working-directory: mobile
         run: npm install --no-audit --no-fund
-      - name: Generate Android project
-        working-directory: mobile
-        run: npx expo prebuild --platform android --no-install
       - name: Bundle JavaScript into debug APK
         working-directory: mobile/android
         run: |
@@ -55,6 +55,22 @@ jobs:
           p.write_text(s)
           print("Configured React Native to bundle JS for debug variant")
           PY
+      - name: Build embedded ARM64 Linux runtime
+        run: |
+          docker buildx build --platform linux/arm64 --load -f docker/Dockerfile -t ds-bot:android-arm64 .
+          cid=$(docker create ds-bot:android-arm64)
+          mkdir -p runtime/rootfs
+          docker export "$cid" | tar -xpf - -C runtime/rootfs
+          docker rm "$cid"
+          bash scripts/build-android-runtime.sh runtime
+      - name: Generate Android project
+        working-directory: mobile
+        run: npx expo prebuild --platform android --no-install
+      - name: Copy runtime into APK assets
+        run: |
+          mkdir -p mobile/android/app/src/main/assets
+          cp dist/ds-bot-linux-arm64.tar.gz mobile/android/app/src/main/assets/runtime.tar.gz
+          cp dist/ds-bot-linux-arm64.tar.gz.sha256 mobile/android/app/src/main/assets/runtime.tar.gz.sha256
       - name: Build debug APK
         working-directory: mobile/android
         run: ./gradlew --no-daemon assembleDebug
