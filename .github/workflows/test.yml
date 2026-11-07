@@ -89,8 +89,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm ci --prefix "$GITHUB_WORKSPACE/mobile" --no-fund --no-audit
-      - run: npm run typecheck --prefix "$GITHUB_WORKSPACE/mobile"
+      - name: Install mobile dependencies
+        run: cd "$GITHUB_WORKSPACE/mobile" && pwd && test -f package-lock.json && npm ci --no-fund --no-audit
+      - name: Typecheck mobile app
+        run: cd "$GITHUB_WORKSPACE/mobile" && npm run typecheck
 
   app-package:
     name: Desktop app package (Windows)
