@@ -66,12 +66,13 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Publish APK release asset
-        if: github.event_name == 'workflow_dispatch'
+      - name: Publish latest APK release asset
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: \${{ inputs.release_tag }}
-          name: DS Bot Android APK \${{ inputs.release_tag }}
+          tag_name: \${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || 'android-debug-latest' }}
+          name: DS Bot Android APK (Latest)
+          target_commitish: \${{ github.sha }}
           files: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          overwrite_files: true
 
 # Debug APKs must embed index.android.bundle; otherwise React Native tries to contact Metro.
