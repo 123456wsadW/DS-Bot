@@ -153,7 +153,7 @@ class LocalLinuxModule : Module() {
         env["DEEPSEEK_API_KEY"] = apiKey
       }.start()
       process = launched
-      output = "Bot process started (pid ${launched.pid()})"
+      output = "Bot process started"
       thread(isDaemon = true) {
         launched.inputStream.bufferedReader().useLines { lines ->
           lines.forEach { line -> synchronized(this@LocalLinuxModule) { output = (output + "\n" + line).takeLast(12000) } }
@@ -166,7 +166,7 @@ class LocalLinuxModule : Module() {
           output = (output + "\nBot process exited: $exitCode").takeLast(12000)
         }
       }
-      mapOf("running" to launched.isAlive, "pid" to launched.pid())
+      mapOf("running" to launched.isAlive)
     }
 
     AsyncFunction("stopBot") {
