@@ -47,11 +47,11 @@ jobs:
           import re
           p = Path("app/build.gradle")
           s = p.read_text()
-          m = re.search(r'(?m)^react\\s*\\{', s)
+          m = re.search(r'(?m)^react\s*\{', s)
           if not m:
               raise SystemExit("React Native Gradle react { } block not found")
           insert = m.end()
-          s = s[:insert] + "\\n    debuggableVariants = []" + s[insert:]
+          s = s[:insert] + "\n    debuggableVariants = []" + s[insert:]
           p.write_text(s)
           print("Configured React Native to bundle JS for debug variant")
           PY
@@ -70,8 +70,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.release_tag }}
-          name: DS Bot Android APK ${{ inputs.release_tag }}
+          tag_name: \${{ inputs.release_tag }}
+          name: DS Bot Android APK \${{ inputs.release_tag }}
           files: mobile/android/app/build/outputs/apk/debug/app-debug.apk
 
 # Debug APKs must embed index.android.bundle; otherwise React Native tries to contact Metro.
