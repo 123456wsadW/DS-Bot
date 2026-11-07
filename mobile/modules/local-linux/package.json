@@ -1,0 +1,6 @@
+{
+  "name": "@dsbot/local-linux",
+  "version": "0.1.0",
+  "private": true,
+  "main": "LocalLinux.ts"
+}
