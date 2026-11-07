@@ -27,18 +27,25 @@ class LocalLinuxModule : Module() {
 
     AsyncFunction("installRuntime") { url: String, expectedSha256: String ->
       val ctx = appContext.reactContext ?: throw Exception("Android context unavailable")
-      require(url.startsWith("https://")) { "Runtime URL must use HTTPS" }
-      require(expectedSha256.matches(Regex("^[a-fA-F0-9]{64}$"))) { "Invalid SHA-256" }
+      val bundled = url == "asset://runtime.tar.gz"
+      if (!bundled) require(url.startsWith("https://")) { "Runtime URL must use HTTPS" }
       val base = File(ctx.filesDir, "linux")
       val archive = File(ctx.cacheDir, "linux-runtime.tar.gz.part")
-      try { downloadRuntimeArchive(url, archive) } catch (e: Exception) { archive.delete(); throw e }
+      val expected = if (bundled) {
+        ctx.assets.open("runtime.tar.gz").use { input -> FileOutputStream(archive).use { input.copyTo(it) } }
+        ctx.assets.open("runtime.tar.gz.sha256").bufferedReader().use { it.readLine().trim().substringBefore(Regex("\\s")) }
+      } else {
+        require(expectedSha256.matches(Regex("^[a-fA-F0-9]{64}$"))) { "Invalid SHA-256" }
+        try { downloadRuntimeArchive(url, archive) } catch (e: Exception) { archive.delete(); throw e }
+        expectedSha256
+      }
       val digest = MessageDigest.getInstance("SHA-256")
       FileInputStream(archive).use { input ->
         val buffer = ByteArray(64 * 1024)
         while (true) { val n = input.read(buffer); if (n < 0) break; digest.update(buffer, 0, n) }
       }
       val actual = digest.digest().joinToString("") { "%02x".format(it) }
-      if (!actual.equals(expectedSha256, true)) { archive.delete(); throw Exception("Runtime checksum mismatch") }
+      if (!actual.equals(expected, true)) { archive.delete(); throw Exception("Runtime checksum mismatch") }
       val staging = File(ctx.filesDir, "linux.installing")
       staging.deleteRecursively(); staging.mkdirs()
       try {
