@@ -39,6 +39,22 @@ jobs:
       - name: Generate Android project
         working-directory: mobile
         run: npx expo prebuild --platform android --no-install
+      - name: Bundle JavaScript into debug APK
+        working-directory: mobile/android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path("app/build.gradle")
+          s = p.read_text()
+          m = re.search(r'(?m)^react\\s*\\{', s)
+          if not m:
+              raise SystemExit("React Native Gradle react { } block not found")
+          insert = m.end()
+          s = s[:insert] + "\\n    debuggableVariants = []" + s[insert:]
+          p.write_text(s)
+          print("Configured React Native to bundle JS for debug variant")
+          PY
       - name: Build debug APK
         working-directory: mobile/android
         run: ./gradlew --no-daemon assembleDebug
@@ -58,4 +74,4 @@ jobs:
           name: DS Bot Android APK ${{ inputs.release_tag }}
           files: mobile/android/app/build/outputs/apk/debug/app-debug.apk
 
-# Triggered automatically on main updates for unattended APK builds.
+# Debug APKs must embed index.android.bundle; otherwise React Native tries to contact Metro.
