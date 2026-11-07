@@ -90,7 +90,7 @@ jobs:
         with:
           node-version: 24
       - name: Install mobile dependencies
-        run: cd "$GITHUB_WORKSPACE/mobile" && pwd && test -f package-lock.json && npm ci --no-fund --no-audit
+        run: cd "$GITHUB_WORKSPACE/mobile" && pwd && test -f package-lock.json && npm install --no-fund --no-audit
       - name: Typecheck mobile app
         run: cd "$GITHUB_WORKSPACE/mobile" && npm run typecheck
 
