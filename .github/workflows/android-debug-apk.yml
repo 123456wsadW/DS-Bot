@@ -69,9 +69,9 @@ jobs:
       - name: Publish latest APK release asset
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: \${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || 'android-debug-latest' }}
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || 'android-debug-latest' }}
           name: DS Bot Android APK (Latest)
-          target_commitish: \${{ github.sha }}
+          target_commitish: ${{ github.sha }}
           files: mobile/android/app/build/outputs/apk/debug/app-debug.apk
           overwrite_files: true
 
