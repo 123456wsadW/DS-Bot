@@ -89,8 +89,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm ci --no-fund --no-audit
-      - run: npm run typecheck
+      - run: npm ci --prefix "$GITHUB_WORKSPACE/mobile" --no-fund --no-audit
+      - run: npm run typecheck --prefix "$GITHUB_WORKSPACE/mobile"
 
   app-package:
     name: Desktop app package (Windows)
