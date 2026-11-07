@@ -68,9 +68,6 @@ jobs:
           docker export "$cid" | tar -xpf - -C runtime/rootfs
           docker rm "$cid"
           bash scripts/build-android-runtime.sh runtime
-      - name: Generate Android project
-        working-directory: mobile
-        run: npx expo prebuild --platform android --no-install
       - name: Copy runtime into APK assets
         run: |
           mkdir -p mobile/android/app/src/main/assets
