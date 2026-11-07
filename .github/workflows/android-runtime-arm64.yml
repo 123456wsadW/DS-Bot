@@ -54,3 +54,5 @@ jobs:
           files: |
             dist/ds-bot-linux-arm64.tar.gz
             dist/ds-bot-linux-arm64.tar.gz.sha256
+
+# Triggered automatically on main updates for unattended runtime builds.
