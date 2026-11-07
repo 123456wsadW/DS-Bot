@@ -9,7 +9,8 @@ trap 'rm -rf "$WORK"' EXIT
 # Termux ARM64 repository. Keep versions and hashes pinned for reproducibility.
 BASE=https://packages.termux.dev/apt/termux-main
 fetch_deb() {
-  local rel="$1" sha="$2" dest="$WORK/$(basename "$rel")"
+  local rel="$1" sha="$2"
+  local dest="$WORK/$(basename "$rel")"
   python3 - "$BASE/$rel" "$dest" <<'PY'
 import sys, urllib.request
 urllib.request.urlretrieve(sys.argv[1], sys.argv[2])
