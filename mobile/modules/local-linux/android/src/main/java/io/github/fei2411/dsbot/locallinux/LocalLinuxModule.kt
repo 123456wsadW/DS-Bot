@@ -33,7 +33,7 @@ class LocalLinuxModule : Module() {
       val archive = File(ctx.cacheDir, "linux-runtime.tar.gz.part")
       val expected = if (bundled) {
         ctx.assets.open("runtime.tar.gz").use { input -> FileOutputStream(archive).use { input.copyTo(it) } }
-        ctx.assets.open("runtime.tar.gz.sha256").bufferedReader().use { it.readLine().trim().substringBefore(Regex("\\s")) }
+        ctx.assets.open("runtime.tar.gz.sha256").bufferedReader().use { it.readLine().trim().split(Regex("\\s+"))[0] }
       } else {
         require(expectedSha256.matches(Regex("^[a-fA-F0-9]{64}$"))) { "Invalid SHA-256" }
         try { downloadRuntimeArchive(url, archive) } catch (e: Exception) { archive.delete(); throw e }
