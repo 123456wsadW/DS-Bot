@@ -32,8 +32,11 @@ class LocalLinuxModule : Module() {
       val base = File(ctx.filesDir, "linux")
       val archive = File(ctx.cacheDir, "linux-runtime.tar.gz.part")
       val expected = if (bundled) {
-        ctx.assets.open("runtime.tar.gz").use { input -> FileOutputStream(archive).use { input.copyTo(it) } }
-        ctx.assets.open("runtime.tar.gz.sha256").bufferedReader().use { it.readLine().trim().split(Regex("\\s+"))[0] }
+        val archiveId = ctx.resources.getIdentifier("runtime_archive", "raw", ctx.packageName)
+        val checksumId = ctx.resources.getIdentifier("runtime_sha256", "raw", ctx.packageName)
+        require(archiveId != 0 && checksumId != 0) { "Embedded Linux runtime resources are missing from this APK" }
+        ctx.resources.openRawResource(archiveId).use { input -> FileOutputStream(archive).use { input.copyTo(it) } }
+        ctx.resources.openRawResource(checksumId).bufferedReader().use { it.readLine().trim().split(Regex("\\s+"))[0] }
       } else {
         require(expectedSha256.matches(Regex("^[a-fA-F0-9]{64}$"))) { "Invalid SHA-256" }
         try { downloadRuntimeArchive(url, archive) } catch (e: Exception) { archive.delete(); throw e }
