@@ -70,9 +70,11 @@ jobs:
           bash scripts/build-android-runtime.sh runtime
       - name: Copy runtime into APK assets
         run: |
-          mkdir -p mobile/android/app/src/main/assets
-          cp dist/ds-bot-linux-arm64.tar.gz mobile/android/app/src/main/assets/runtime.tar.gz
-          cp dist/ds-bot-linux-arm64.tar.gz.sha256 mobile/android/app/src/main/assets/runtime.tar.gz.sha256
+          mkdir -p mobile/android/app/src/main/res/raw
+          cp dist/ds-bot-linux-arm64.tar.gz mobile/android/app/src/main/res/raw/runtime_archive.gz
+          cp dist/ds-bot-linux-arm64.tar.gz.sha256 mobile/android/app/src/main/res/raw/runtime_sha256.txt
+          test -s mobile/android/app/src/main/res/raw/runtime_archive.gz
+          test -s mobile/android/app/src/main/res/raw/runtime_sha256.txt
       - name: Build debug APK
         working-directory: mobile/android
         run: ./gradlew --no-daemon assembleDebug
